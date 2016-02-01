@@ -1,0 +1,158 @@
+#+TITLE: Robust Bayesian Modeling
+#+AUTHOR: Yau Group meeting
+#+DATE: February 2, 2016
+#+email: Tammo Rukat
+# #+AUTHOR: Tammo Rukat
+
+#+OPTIONS: reveal_single_file:t 
+#+OPTIONS: reveal_center:f reveal_progress:t reveal_history:nil reveal_control:f
+#+OPTIONS: reveal_mathjax:t reveal_rolling_links:f reveal_keyboard:t reveal_overview:t num:nil
+#+OPTIONS: reveal_width:1400 reveal_height:1000
+#+OPTIONS: toc:1
+# #+REVEAL_MARGIN: 0.01
+#+REVEAL_MIN_SCALE: 0.5
+#+REVEAL_MAX_SCALE: 2.5
+#+REVEAL_TRANS: cube 
+# default|cube|page|concave|zoom|linear|fade|none.
+#+REVEAL_THEME: sky
+ # sky, league, moon, solarized, league
+#+REVEAL_HLEVEL: 1
+#+REVEAL_PLUGINS: (highlight markdown notes)
+# #+REVEAL_EXTRA_CSS: ./local.css
+#+REVEAL_SLIDE_NUMBER: t
+#+REVEAL_DEFAULT_FRAG_STYLE: roll-in
+#+OPTIONS: org-reveal-center:t
+
+* Bayesian Modeling
+** What is a Bayesian Model?
+- A joint distribution of parameters $\beta$ and data $x$.
+- We usually think of exchangable models $$p(\beta,x) = \underbrace{p(\beta|\alpha)}_{\text{prior}}\;\prod_{i=1}^{n} \underbrace{p(x_i|\beta)}_{\text{likelihood}}$$
+[[./figures/gm1.png]]
+
+- This can be generalised to include conditional models or latent variables, e.g. $$ p(x_i|\beta) = \sum_z p(x_i,z_i|\beta) $$
+
+#+BEGIN_NOTES
+- data is assumed to be drawn from the parameter
+- parameter is drawn from the prior.
+- we condition on data to calculate the posterior distribution of parameters
+- when the data is small, the prior plays a big role
+- for large date the posterior converges to a point mass (independent of the model being true or not)
+#+END_NOTES
+** Interlude: What is the difference between parameters and latent variables?
+#+ATTR_REVEAL: :frag (none appear appear) :frag_idx (- 2 3)
+- Joint distribution: $$p(\beta,\mathbf{z},\mathbf{x}) = \underbrace{p(\beta|\alpha)}_{\text{parameters}} \prod_{i=1}^n \underbrace{p(z_i|\gamma)}_{\text{latent variables}} p(x_i|\beta,z_i)$$
+- Practical notion:
+  + Number of latent variables grows with number of data points.
+  + Number of parameters stays fixed.
+- *There is no real difference*
+** A useful distinction: Local vs global variables
+$$p(\beta,\mathbf{z},\mathbf{x}) = \underbrace{p(\beta|\alpha)}_{\text{global}} \prod_{i=1}^n \underbrace{p(z_i|\gamma)}_{\text{local}} p(x_i|\beta,z_i)$$
+#+ATTR_REVEAL: :frag (appear appear) :frag_idx (2 3)
+- The distinction is determined by conditional dependencies: $$p(x_i,z_i|x_{-i},z_{-i},\beta) = p(x_i,z_i|\beta)$$
+
+#+BEGIN_NOTES
+The ith observation and the ith local variable are conditional independent, given the global variable, of all other local variables and observation
+#+END_NOTES
+** Example: Gaussian mixture model
+- Which are the local and which are the global variables? $$\;p(\mathbf{x}|\mathbf{z}) = \prod\limits_k  \mathcal{N}(x|\mu_k,\sigma_k)^{z_{k}}; \;\;\;\;\;\; p(\mathbf{z}) = \prod\limits_k \pi_k^{z_k} $$
+  #+ATTR_REVEAL: :frag (appear appear) :frag_idx (2 2)
+  - global: means $\mu_k$, standard deviations $\sigma_k$, mixture proportions $\pi_k$;
+  - local: cluster assignments $z_k$.
+
+
+# ** Example 2: Linear Regression
+#  - Linear regression: $\;p(x_i|\mathbf{y},\beta) = \mathcal{N}(\mathbf{w}^T \phi(\mathbf{y}), \sigma^2)$
+# ** Posterior predictive distribution
+# $$p(x_i|\mathbf{x},\alpha) = \int p(x_i|\beta)p(\beta|\mathbf{x},\alpha)d\beta$$
+# #+ATTR_REVEAL: :frag (appear appear) :frag_idx (2 3)
+# - Distribution of unseen data, only when the chosen model represents the true distribution of the data.
+# # - In practice, this is never the case.
+
+# #+BEGIN_NOTES
+# - Integrates data likelihood under the posterior
+# - In practice the model never represents the true distribution of the data.
+# - We build models to simpify the data generating process. That's  why the posterior predictive is interesting. it can tell us about deviations from the model assumption and about their significance
+# #+END_NOTES
+
+* Robust Bayesian Modeling
+** Motivation
+- We follow /Wang and Blei, 2015 -- A General Method for Robust Bayesian Modeling/
+... *all models are wrong* ...
+#+ATTR_REVEAL: :frag (appear appear appear) :frag)idx (2 3 4)
+# - How do extreme deviations from the model assumption (outliers) affect inference?
+- *Robustness*: Inference should be insensitive to small deviations from the model assumptions.
+- Wang and Blei introduce a general framework for robust Bayesian modeling.
+
+#+BEGIN_NOTES
+- the most generic approach is to use distributions with heavier tails
+- until now robust models have been build on a case by case basis
+- The aim of the authors is to introduce a general framework
+#+END_NOTES
+
+** Key idea: Localisation of global parameters
+#+ATTR_REVEAL: :frag (appear appear appear appear) :frag_idx (1 2 3 4)
+- Classical model: $$ p(\beta,\mathbf{x}) = p(\beta|\alpha) \prod\limits_{i=1}^n p(x_i|\beta) $$
+  - All data is drawn from the parameter.
+  - The hyperparmater $\alpha$ is usually fixed.
+- Robust model: $$ p(\mathbf{\beta},\mathbf{x}) = \prod\limits_{i=1}^n p(\beta_i|\alpha)  p(x_i|\beta) $$
+  - Every data point is assumed drawn from an individual realisation of the parameter, which is drawn from the prior.
+  - Outliers are explained by variation in the parameters.
+** Graphical Model for Localisation
+#+ATTR_REVEAL: :frag (none appear appear appear) :frag)idx (- 2 3 3)
+- Classic model -- global $\beta$ 
+[[./figures/gm1.png]]
+- Robust model -- local $\beta$
+[[./figures/gm2.png]]
+- We now need to fit the hyperparameter $\alpha$.
+- Fixing $\alpha$ would make the data points independent.
+** Example: Normal observation model
+#+ATTR_REVEAL: :frag (appear) :frag)idx (1)
+- Localise the precision parameter and use the conjugate prior
+#+ATTR_REVEAL: :frag (none) :frag)idx (-)
+$\begin{align} p(x_i|\alpha) &= \int p(x_i|\beta_i) p(\beta_i|\alpha) d\beta_i \\
+&= \int \mathcal{N}(x_i|\mu,\sigma_i)\; \text{Gam}^{-1}(\sigma_i|\alpha) d\sigma_i \end{align}$
+#+ATTR_REVEAL: :frag (appear) :frag)idx (2)
+- Any guesses? 
+#+ATTR_REVEAL: :frag (appear) :frag)idx (3)
+$$ p(x_i|\alpha) = \text{Student-t}(x_i|\mu,\alpha = (\lambda,\nu) ) $$ [[./figures/student_t.png]]
+
+# - Now each data point is governed by it's own parameter $\beta_i$, drawn from the prior $$ p(x_i|\alpha) = \int p(x_i|\beta_i) p(\beta_i|\alpha) d\beta_i $$ 
+** 2nd key idea: Empirical Bayes
+#+ATTR_REVEAL: :frag (appear appear appear) :frag)idx (1 1 3)
+- Estimate hyperparameters via maximum likelihood $$ \hat{\alpha}=\text{arg max}_{\alpha} \sum\limits_{i=1}^{n} \int p(x_i|\beta_i) p(\beta_i|\alpha) d\beta_i $$
+- aka *evidence approximation* $$ \text{evidence} = p(x_i|\alpha) = \int p(x_i|\beta_i) p(\beta_i|\alpha) d\beta_i $$
+- *Here we use the data to determine the prior, is that legit?*
+
+* Performance
+** Linear Regression
+- Trainin data: $\begin{align} y_i|x_i &\sim \mathcal{N}(\omega^T x_i + b, \sigma_i + 0.02) \\ \sigma_i &\sim \text{Gamma}(k,1) \end{align}$
+
+- Test data: $\begin{align} y_i|x_i \sim \mathcal{N}(\omega^T x_i + b, 0.02) \end{align}$
+
+[[./figures/lin_reg_error.png]]
+
+[[./figures/legend.png]]
+
+** Logistic Regression
+$$ y_i | x_i \sim \text{Bernoulli}(\sigma(\omega^T x_i)) $$
+[[./figures/log_reg_error.png]]
+
+[[./figures/legend.png]]
+
+* The posterior predictive   
+#+ATTR_REVEAL: :frag (appear appear appear) :frag_idx (1 2 3)
+- Classical Bayesian model: $$p(x_i|\mathbf{x},\alpha) = \int p(x_i|\beta)\,p(\beta|\mathbf{x},\alpha)d\beta$$
+  #+ATTR_REVEAL: :frag (appear) :frag_idx (4)
+  - Gives correct predictive distr. only if the data comes from the model.
+- Robust Bayesian model $$p(x_i|\hat{\alpha}) = \int p(x_i|\beta_i)\,p(\beta_i|\hat{\alpha}) d\beta_i$$
+  #+ATTR_REVEAL: :frag (appear) :frag_idx (5)
+  - Gives correct predictive distr. independent of model mismatch.
+- If we want to make predictions under the model, which one should we choose?
+# average with respect to prior instead of posterior, but prior that is optimised with respect to the data
+
+* References
+- Wang and Blei 2015, "A General Method for Robust Bayesian Modeling"
+- Gelman et al. 2014 "Bayesian Data Analysis", 3rd Edition
+- Murphy 2012, "Machine Learning: A Probabilistic Perspective"
+- Carlin and Louis 2000, "Empirical Bayes: Past, Present and Future"
+# - outlince contributions of various references

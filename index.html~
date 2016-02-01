@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Robust Bayesian Modeling</title>
+<meta name="author" content="(Yau Group meeting)"/>
+
+<link rel="stylesheet" href="./css/reveal.css"/>
+<link rel="stylesheet" href="./css/theme/sky.css" id="theme"/>
+
+<!-- If the query includes 'print-pdf', include the PDF print sheet -->
+<script>
+    if( window.location.search.match( /print-pdf/gi ) ) {
+        var link = document.createElement( 'link' );
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = './css/print/pdf.css';
+        document.getElementsByTagName( 'head' )[0].appendChild( link );
+    }
+</script>
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+<section id="sec-title-slide">
+<h1>Robust Bayesian Modeling</h1>
+<h2>Yau Group meeting</h2>
+<h2><a href="mailto:Tammo Rukat">Tammo Rukat</a></h2>
+<h2>February 2, 2016</h2>
+</section>
+<section id="table-of-contents">
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#/slide-sec-1">Bayesian Modeling</a></li>
+<li><a href="#/slide-sec-2">Robust Bayesian Modeling</a></li>
+<li><a href="#/slide-sec-3">Performance</a></li>
+<li><a href="#/slide-sec-4">References</a></li>
+</ul>
+</div>
+</div>
+</section>
+
+<section>
+<section id="slide-sec-1">
+<h2 id="sec-1">Bayesian Modeling</h2>
+<div class="outline-text-2" id="text-1">
+</div></section>
+<section id="slide-sec-1-1">
+<h3 id="sec-1-1">What is a Bayesian Model?</h3>
+<ul>
+<li>A joint distribution of parameters \(\beta\) and data \(x\).</li>
+<li>We usually think of exchangable models $$p(\beta,x) = \underbrace{p(\beta|\alpha)}_{\text{prior}}\;\prod_{i=1}^{n} \underbrace{p(x_i|\beta)}_{\text{likelihood}}$$</li>
+
+</ul>
+
+<div class="figure">
+<p><img src="./figures/gm1.png" alt="gm1.png" />
+</p>
+</div>
+
+<ul>
+<li>This can be generalised to include conditional models or latent variables, e.g. $$ p(x_i|\beta) = \sum_z p(x_i,z_i|\beta) $$</li>
+
+</ul>
+
+<aside class="notes">
+<ul class="org-ul">
+<li>data is assumed to be drawn from the parameter
+</li>
+<li>parameter is drawn from the prior.
+</li>
+<li>we condition on data to calculate the posterior distribution of parameters
+</li>
+<li>when the data is small, the prior plays a big role
+</li>
+<li>for large date the posterior converges to a point mass (independent of the model being true or not)
+</li>
+</ul>
+
+</aside>
+</section>
+<section id="slide-sec-1-2">
+<h3 id="sec-1-2">Interlude: What is the difference between parameters and latent variables?</h3>
+<ul>
+<li>Joint distribution: $$p(\beta,\mathbf{z},\mathbf{x}) = \underbrace{p(\beta|\alpha)}_{\text{parameters}} \prod_{i=1}^n \underbrace{p(z_i|\gamma)}_{\text{latent variables}} p(x_i|\beta,z_i)$$</li>
+<li data-fragment-index="2" class="fragment appear">Practical notion:
+<ul>
+<li>Number of latent variables grows with number of data points.</li>
+<li>Number of parameters stays fixed.</li>
+
+</ul></li>
+<li data-fragment-index="3" class="fragment appear"><b>There is no real difference</b></li>
+
+</ul>
+</section>
+<section id="slide-sec-1-3">
+<h3 id="sec-1-3">A useful distinction: Local vs global variables</h3>
+<p>
+$$p(\beta,\mathbf{z},\mathbf{x}) = \underbrace{p(\beta|\alpha)}_{\text{global}} \prod_{i=1}^n \underbrace{p(z_i|\gamma)}_{\text{local}} p(x_i|\beta,z_i)$$
+</p>
+<ul>
+<li data-fragment-index="2" class="fragment appear">The distinction is determined by conditional dependencies: $$p(x_i,z_i|x_{-i},z_{-i},\beta) = p(x_i,z_i|\beta)$$</li>
+
+</ul>
+
+<aside class="notes">
+<p>
+The ith observation and the ith local variable are conditional independent, given the global variable, of all other local variables and observation
+</p>
+
+</aside>
+</section>
+<section id="slide-sec-1-4">
+<h3 id="sec-1-4">Example: Gaussian mixture model</h3>
+<ul>
+<li>Which are the local and which are the global variables? $$\;p(\mathbf{x}|\mathbf{z}) = \prod\limits_k  \mathcal{N}(x|\mu_k,\sigma_k)^{z_{k}}; \;\;\;\;\;\; p(\mathbf{z}) = \prod\limits_k \pi_k^{z_k} $$
+<ul>
+<li data-fragment-index="2" class="fragment appear">global: means \(\mu_k\), standard deviations \(\sigma_k\), mixture proportions \(\pi_k\);</li>
+<li data-fragment-index="2" class="fragment appear">local: cluster assignments \(z_k\).</li>
+
+</ul></li>
+
+</ul>
+
+</section>
+</section>
+<section>
+<section id="slide-sec-2">
+<h2 id="sec-2">Robust Bayesian Modeling</h2>
+<div class="outline-text-2" id="text-2">
+</div></section>
+<section id="slide-sec-2-1">
+<h3 id="sec-2-1">Motivation</h3>
+<ul>
+<li>We follow <i>Wang and Blei, 2015 &#x2013; A General Method for Robust Bayesian Modeling</i></li>
+
+</ul>
+<p>
+&#x2026; <b>all models are wrong</b> &#x2026;
+</p>
+<ul>
+<li><b>Robustness</b>: Inference should be insensitive to small deviations from the model assumptions.</li>
+<li>Wang and Blei introduce a general framework for robust Bayesian modeling.</li>
+
+</ul>
+
+<aside class="notes">
+<ul class="org-ul">
+<li>the most generic approach is to use distributions with heavier tails
+</li>
+<li>until now robust models have been build on a case by case basis
+</li>
+<li>The aim of the authors is to introduce a general framework
+</li>
+</ul>
+
+</aside>
+
+</section>
+<section id="slide-sec-2-2">
+<h3 id="sec-2-2">Key idea: Localisation of global parameters</h3>
+<ul>
+<li data-fragment-index="1" class="fragment appear">Classical model: $$ p(\beta,\mathbf{x}) = p(\beta|\alpha) \prod\limits_{i=1}^n p(x_i|\beta) $$
+<ul>
+<li>All data is drawn from the parameter.</li>
+<li>The hyperparmater \(\alpha\) is usually fixed.</li>
+
+</ul></li>
+<li data-fragment-index="2" class="fragment appear">Robust model: $$ p(\mathbf{\beta},\mathbf{x}) = \prod\limits_{i=1}^n p(\beta_i|\alpha)  p(x_i|\beta) $$
+<ul>
+<li>Every data point is assumed drawn from an individual realisation of the parameter, which is drawn from the prior.</li>
+<li>Outliers are explained by variation in the parameters.</li>
+
+</ul></li>
+
+</ul>
+</section>
+<section id="slide-sec-2-3">
+<h3 id="sec-2-3">Graphical Model for Localisation</h3>
+<ul>
+<li>Classic model &#x2013; global \(\beta\)</li>
+
+</ul>
+
+<div class="figure">
+<p><img src="./figures/gm1.png" alt="gm1.png" />
+</p>
+</div>
+<ul>
+<li>Robust model &#x2013; local \(\beta\)</li>
+
+</ul>
+
+<div class="figure">
+<p><img src="./figures/gm2.png" alt="gm2.png" />
+</p>
+</div>
+<ul>
+<li>We now need to fit the hyperparameter \(\alpha\).</li>
+<li>Fixing \(\alpha\) would make the data points independent.</li>
+
+</ul>
+</section>
+<section id="slide-sec-2-4">
+<h3 id="sec-2-4">Example: Normal observation model</h3>
+<ul>
+<li class="fragment appear">Localise the precision parameter and use the conjugate prior</li>
+
+</ul>
+<span class="fragment (none) :frag)idx (-)"><p>
+\(\begin{align} p(x_i|\alpha) &= \int p(x_i|\beta_i) p(\beta_i|\alpha) d\beta_i \\
+&= \int \mathcal{N}(x_i|\mu,\sigma_i)\; \text{Gam}^{-1}(\sigma_i|\alpha) d\sigma_i \end{align}\)
+</p></span>
+<ul>
+<li class="fragment appear">Any guesses?</li>
+
+</ul>
+<span class="fragment (appear) :frag)idx (3)"><p>
+$$ p(x_i|\alpha) = \text{Student-t}(x_i|\mu,\alpha = (\lambda,\nu) ) $$ <img src="./figures/student_t.png" alt="student_t.png" class="fragment (appear) :frag)idx (3)" />
+</p></span>
+</section>
+<section id="slide-sec-2-5">
+<h3 id="sec-2-5">2nd key idea: Empirical Bayes</h3>
+<ul>
+<li class="fragment appear">Estimate hyperparameters via maximum likelihood $$ \hat{\alpha}=\text{arg max}_{\alpha} \sum\limits_{i=1}^{n} \int p(x_i|\beta_i) p(\beta_i|\alpha) d\beta_i $$</li>
+<li class="fragment appear">aka <b>evidence approximation</b> $$ \text{evidence} = p(x_i|\alpha) = \int p(x_i|\beta_i) p(\beta_i|\alpha) d\beta_i $$</li>
+<li class="fragment appear"><b>Here we use the data to determine the prior, is that legit?</b></li>
+
+</ul>
+</section>
+<section id="slide-sec-2-6">
+<h3 id="sec-2-6">The posterior predictive</h3>
+<ul>
+<li data-fragment-index="1" class="fragment appear">Classical Bayesian model: $$p(x_i|\mathbf{x},\alpha) = \int p(x_i|\beta)\,p(\beta|\mathbf{x},\alpha)d\beta$$
+<ul>
+<li data-fragment-index="4" class="fragment appear">Gives correct predictive distr. only if the data comes from the model.</li>
+
+</ul></li>
+<li data-fragment-index="2" class="fragment appear">Robust Bayesian model $$p(x_i|\hat{\alpha}) = \int p(x_i|\beta_i)\,p(\beta_i|\hat{\alpha}) d\beta_i$$
+<ul>
+<li data-fragment-index="5" class="fragment appear">Gives correct predictive distr. independent of model mismatch.</li>
+
+</ul></li>
+<li data-fragment-index="3" class="fragment appear">If we want to make predictions under the model, which one should we choose?</li>
+
+</ul>
+
+</section>
+</section>
+<section>
+<section id="slide-sec-3">
+<h2 id="sec-3">Performance</h2>
+<div class="outline-text-2" id="text-3">
+</div></section>
+<section id="slide-sec-3-1">
+<h3 id="sec-3-1">Linear Regression</h3>
+<ul>
+<li>Trainin data: \(\begin{align} y_i|x_i &\sim \mathcal{N}(\omega^T x_i + b, \sigma_i + 0.02) \\ \sigma_i &\sim \text{Gamma}(k,1) \end{align}\)</li>
+
+<li>Test data: \(\begin{align} y_i|x_i \sim \mathcal{N}(\omega^T x_i + b, 0.02) \end{align}\)</li>
+
+</ul>
+
+
+<div class="figure">
+<p><img src="./figures/lin_reg_error.png" alt="lin_reg_error.png" />
+</p>
+</div>
+
+
+<div class="figure">
+<p><img src="./figures/legend.png" alt="legend.png" />
+</p>
+</div>
+</section>
+</section>
+<section>
+<section id="slide-sec-4">
+<h2 id="sec-4">References</h2>
+<ul>
+<li>Wang and Blei 2015, "A General Method for Robust Bayesian Modeling"</li>
+<li>Gelman et al. 2014 "Bayesian Data Analysis", 3rd Edition</li>
+<li>Murphy 2012, "Machine Learning: A Probabilistic Perspective"</li>
+<li>Carlin and Louis 2000, "Empirical Bayes: Past, Present and Future"</li>
+
+</ul>
+</section>
+</section>
+</div>
+</div>
+
+<script src="./lib/js/head.min.js"></script>
+<script src="./js/reveal.js"></script>
+
+<script>
+// Full list of configuration options available here:
+// https://github.com/hakimel/reveal.js#configuration
+Reveal.initialize({
+
+controls: true,
+progress: true,
+history: false,
+center: true,
+slideNumber: true,
+rollingLinks: true,
+keyboard: true,
+overview: true,
+width: 1400,
+height: 1000,
+minScale: 0.50,
+maxScale: 2.50,
+
+theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+transition: Reveal.getQueryHash().transition || 'cube', // default/cube/page/concave/zoom/linear/fade/none
+transitionSpeed: 'default',
+multiplex: {
+    secret: '', // null if client
+    id: '', // id, obtained from socket.io server
+    url: '' // Location of socket.io server
+},
+
+// Optional libraries used to extend on reveal.js
+dependencies: [
+ { src: './plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+ { src: './plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+ { src: './plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+ { src: './plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+]
+});
+</script>
+</body>
+</html>
