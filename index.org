@@ -25,11 +25,16 @@
 
 * Bayesian Modeling
 ** What is a Bayesian Model?
+#+ATTR_REVEAL: :frag (appear appear) :frag_idx (2 3)
 - A joint distribution of parameters $\beta$ and data $x$.
 - We usually think of exchangable models $$p(\beta,x) = \underbrace{p(\beta|\alpha)}_{\text{prior}}\;\prod_{i=1}^{n} \underbrace{p(x_i|\beta)}_{\text{likelihood}}$$
-[[./figures/gm1.png]]
 
-- This can be generalised to include conditional models or latent variables, e.g. $$ p(x_i|\beta) = \sum_z p(x_i,z_i|\beta) $$
+#+REVEAL_HTML:<br><img data-fragment-index="4" class="fragment appear" src="./figures/gm1.png" alt="gm1.png" /><br>
+#+ATTR_REVEAL: :frag (appear) :frag_idx (5)
+- Generalise this to accomodate most common models
+  #+ATTR_REVEAL: :frag (appear appear) :frag_idx (6 7)
+  - conditional models: $p(x_i|\beta) \rightarrow p(x_i|\mathbf{y}_i,\beta) \stackrel{\text{e.g.}}{=}\mathcal{N}(x_i|\mathbf{w}^T \mathbf{y}_i,\sigma)$
+  - or latent variable models: $p(x_i|\beta) = \sum_z p(x_i,z_i|\beta) \stackrel{\text{e.g.}}{=} \sum_k \pi_k \mathcal{N}(x_i|\mu_k,\sigma_k)$
 
 #+BEGIN_NOTES
 - data is assumed to be drawn from the parameter
@@ -39,7 +44,7 @@
 - for large date the posterior converges to a point mass (independent of the model being true or not)
 #+END_NOTES
 ** Interlude: What is the difference between parameters and latent variables?
-#+ATTR_REVEAL: :frag (none appear appear) :frag_idx (- 2 3)
+#+ATTR_REVEAL: :frag (appear appear appear) :frag_idx (1 2 3)
 - Joint distribution: $$p(\beta,\mathbf{z},\mathbf{x}) = \underbrace{p(\beta|\alpha)}_{\text{parameters}} \prod_{i=1}^n \underbrace{p(z_i|\gamma)}_{\text{latent variables}} p(x_i|\beta,z_i)$$
 - Practical notion:
   + Number of latent variables grows with number of data points.
@@ -54,7 +59,9 @@ $$p(\beta,\mathbf{z},\mathbf{x}) = \underbrace{p(\beta|\alpha)}_{\text{global}} 
 The ith observation and the ith local variable are conditional independent, given the global variable, of all other local variables and observation
 #+END_NOTES
 ** Example: Gaussian mixture model
-- Which are the local and which are the global variables? $$\;p(\mathbf{x}|\mathbf{z}) = \prod\limits_k  \mathcal{N}(x|\mu_k,\sigma_k)^{z_{k}}; \;\;\;\;\;\; p(\mathbf{z}) = \prod\limits_k \pi_k^{z_k} $$
+ #+ATTR_REVEAL: :frag (highlight-red) :frag_idx (1)
+- Which are the local and which are the global variables?
+$$\;p(\mathbf{x}|\mathbf{z}) = \prod\limits_k  \mathcal{N}(x|\mu_k,\sigma_k)^{z_{k}}; \;\;\;\;\;\; p(\mathbf{z}) = \prod\limits_k \pi_k^{z_k}$$
   #+ATTR_REVEAL: :frag (appear appear) :frag_idx (2 2)
   - global: means $\mu_k$, standard deviations $\sigma_k$, mixture proportions $\pi_k$;
   - local: cluster assignments $z_k$.
@@ -76,14 +83,15 @@ The ith observation and the ith local variable are conditional independent, give
 
 * Robust Bayesian Modeling
 ** Motivation
-- We follow /Wang and Blei, 2015 -- A General Method for Robust Bayesian Modeling/
+- Wang and Blei, 2015 -- /A General Method for Robust Bayesian Modeling/
+#+ATTR_REVEAL: :frag (appear appear) :frag)idx (2)
 ... *all models are wrong* ...
-#+ATTR_REVEAL: :frag (appear appear appear) :frag)idx (2 3 4)
-# - How do extreme deviations from the model assumption (outliers) affect inference?
+#+ATTR_REVEAL: :frag (appear appear) :frag)idx (3 4)
 - *Robustness*: Inference should be insensitive to small deviations from the model assumptions.
 - Wang and Blei introduce a general framework for robust Bayesian modeling.
 
 #+BEGIN_NOTES
+- quote is by george box
 - the most generic approach is to use distributions with heavier tails
 - until now robust models have been build on a case by case basis
 - The aim of the authors is to introduce a general framework
@@ -114,15 +122,20 @@ $\begin{align} p(x_i|\alpha) &= \int p(x_i|\beta_i) p(\beta_i|\alpha) d\beta_i \
 #+ATTR_REVEAL: :frag (appear) :frag)idx (2)
 - Any guesses? 
 #+ATTR_REVEAL: :frag (appear) :frag)idx (3)
-$$ p(x_i|\alpha) = \text{Student-t}(x_i|\mu,\alpha = (\lambda,\nu) ) $$ [[./figures/student_t.png]]
+$$ p(x_i|\alpha) = \text{Student-t}(x_i|\mu, (\lambda,\nu)=f(\alpha) ) $$ [[./figures/student_t.png]]
 
 # - Now each data point is governed by it's own parameter $\beta_i$, drawn from the prior $$ p(x_i|\alpha) = \int p(x_i|\beta_i) p(\beta_i|\alpha) d\beta_i $$ 
 ** 2nd key idea: Empirical Bayes
-#+ATTR_REVEAL: :frag (appear appear appear) :frag)idx (1 1 3)
+#+ATTR_REVEAL: :frag (appear appear appear) :frag_idx (1 2 3)
 - Estimate hyperparameters via maximum likelihood $$ \hat{\alpha}=\text{arg max}_{\alpha} \sum\limits_{i=1}^{n} \int p(x_i|\beta_i) p(\beta_i|\alpha) d\beta_i $$
 - aka *evidence approximation* $$ \text{evidence} = p(x_i|\alpha) = \int p(x_i|\beta_i) p(\beta_i|\alpha) d\beta_i $$
 - *Here we use the data to determine the prior, is that legit?*
 
+#+BEGIN_NOTES
+- full bayesian inference: "bayes empirical bayes"
+- needs a hyperprior
+- evidence is the prob of the data, after integrating out the parameters. aka marginal likelihood.
+#+END_NOTES
 * Performance
 ** Linear Regression
 - Trainin data: $\begin{align} y_i|x_i &\sim \mathcal{N}(\omega^T x_i + b, \sigma_i + 0.02) \\ \sigma_i &\sim \text{Gamma}(k,1) \end{align}$

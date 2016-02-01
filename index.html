@@ -53,18 +53,19 @@
 <section id="slide-sec-1-1">
 <h3 id="sec-1-1">What is a Bayesian Model?</h3>
 <ul>
-<li>A joint distribution of parameters \(\beta\) and data \(x\).</li>
-<li>We usually think of exchangable models $$p(\beta,x) = \underbrace{p(\beta|\alpha)}_{\text{prior}}\;\prod_{i=1}^{n} \underbrace{p(x_i|\beta)}_{\text{likelihood}}$$</li>
+<li data-fragment-index="2" class="fragment appear">A joint distribution of parameters \(\beta\) and data \(x\).</li>
+<li data-fragment-index="3" class="fragment appear">We usually think of exchangable models $$p(\beta,x) = \underbrace{p(\beta|\alpha)}_{\text{prior}}\;\prod_{i=1}^{n} \underbrace{p(x_i|\beta)}_{\text{likelihood}}$$</li>
 
 </ul>
 
-<div class="figure">
-<p><img src="./figures/gm1.png" alt="gm1.png" />
-</p>
-</div>
-
+<br><img data-fragment-index="4" class="fragment appear" src="./figures/gm1.png" alt="gm1.png" /><br>
 <ul>
-<li>This can be generalised to include conditional models or latent variables, e.g. $$ p(x_i|\beta) = \sum_z p(x_i,z_i|\beta) $$</li>
+<li data-fragment-index="5" class="fragment appear">Generalise this to accomodate most common models
+<ul>
+<li data-fragment-index="6" class="fragment appear">conditional models: \(p(x_i|\beta) \rightarrow p(x_i|\mathbf{y}_i,\beta) \stackrel{\text{e.g.}}{=}\mathcal{N}(x_i|\mathbf{w}^T \mathbf{y}_i,\sigma)\)</li>
+<li data-fragment-index="7" class="fragment appear">or latent variable models: \(p(x_i|\beta) = \sum_z p(x_i,z_i|\beta) \stackrel{\text{e.g.}}{=} \sum_k \pi_k \mathcal{N}(x_i|\mu_k,\sigma_k)\)</li>
+
+</ul></li>
 
 </ul>
 
@@ -87,7 +88,7 @@
 <section id="slide-sec-1-2">
 <h3 id="sec-1-2">Interlude: What is the difference between parameters and latent variables?</h3>
 <ul>
-<li>Joint distribution: $$p(\beta,\mathbf{z},\mathbf{x}) = \underbrace{p(\beta|\alpha)}_{\text{parameters}} \prod_{i=1}^n \underbrace{p(z_i|\gamma)}_{\text{latent variables}} p(x_i|\beta,z_i)$$</li>
+<li data-fragment-index="1" class="fragment appear">Joint distribution: $$p(\beta,\mathbf{z},\mathbf{x}) = \underbrace{p(\beta|\alpha)}_{\text{parameters}} \prod_{i=1}^n \underbrace{p(z_i|\gamma)}_{\text{latent variables}} p(x_i|\beta,z_i)$$</li>
 <li data-fragment-index="2" class="fragment appear">Practical notion:
 <ul>
 <li>Number of latent variables grows with number of data points.</li>
@@ -118,12 +119,15 @@ The ith observation and the ith local variable are conditional independent, give
 <section id="slide-sec-1-4">
 <h3 id="sec-1-4">Example: Gaussian mixture model</h3>
 <ul>
-<li>Which are the local and which are the global variables? $$\;p(\mathbf{x}|\mathbf{z}) = \prod\limits_k  \mathcal{N}(x|\mu_k,\sigma_k)^{z_{k}}; \;\;\;\;\;\; p(\mathbf{z}) = \prod\limits_k \pi_k^{z_k} $$
+<li data-fragment-index="1" class="fragment highlight-red">Which are the local and which are the global variables?</li>
+
+</ul>
+<p>
+$$\;p(\mathbf{x}|\mathbf{z}) = \prod\limits_k  \mathcal{N}(x|\mu_k,\sigma_k)^{z_{k}}; \;\;\;\;\;\; p(\mathbf{z}) = \prod\limits_k \pi_k^{z_k}$$
+</p>
 <ul>
 <li data-fragment-index="2" class="fragment appear">global: means \(\mu_k\), standard deviations \(\sigma_k\), mixture proportions \(\pi_k\);</li>
 <li data-fragment-index="2" class="fragment appear">local: cluster assignments \(z_k\).</li>
-
-</ul></li>
 
 </ul>
 
@@ -137,20 +141,22 @@ The ith observation and the ith local variable are conditional independent, give
 <section id="slide-sec-2-1">
 <h3 id="sec-2-1">Motivation</h3>
 <ul>
-<li>We follow <i>Wang and Blei, 2015 &#x2013; A General Method for Robust Bayesian Modeling</i></li>
+<li>Wang and Blei, 2015 &#x2013; <i>A General Method for Robust Bayesian Modeling</i></li>
 
 </ul>
-<p>
+<span class="fragment (appear appear) :frag)idx (2)"><p>
 &#x2026; <b>all models are wrong</b> &#x2026;
-</p>
+</p></span>
 <ul>
-<li><b>Robustness</b>: Inference should be insensitive to small deviations from the model assumptions.</li>
-<li>Wang and Blei introduce a general framework for robust Bayesian modeling.</li>
+<li class="fragment appear"><b>Robustness</b>: Inference should be insensitive to small deviations from the model assumptions.</li>
+<li class="fragment appear">Wang and Blei introduce a general framework for robust Bayesian modeling.</li>
 
 </ul>
 
 <aside class="notes">
 <ul class="org-ul">
+<li>quote is by george box
+</li>
 <li>the most generic approach is to use distributions with heavier tails
 </li>
 <li>until now robust models have been build on a case by case basis
@@ -221,18 +227,29 @@ The ith observation and the ith local variable are conditional independent, give
 
 </ul>
 <span class="fragment (appear) :frag)idx (3)"><p>
-$$ p(x_i|\alpha) = \text{Student-t}(x_i|\mu,\alpha = (\lambda,\nu) ) $$ <img src="./figures/student_t.png" alt="student_t.png" class="fragment (appear) :frag)idx (3)" />
+$$ p(x_i|\alpha) = \text{Student-t}(x_i|\mu, (\lambda,\nu)=f(\alpha) ) $$ <img src="./figures/student_t.png" alt="student_t.png" class="fragment (appear) :frag)idx (3)" />
 </p></span>
 </section>
 <section id="slide-sec-2-5">
 <h3 id="sec-2-5">2nd key idea: Empirical Bayes</h3>
 <ul>
-<li class="fragment appear">Estimate hyperparameters via maximum likelihood $$ \hat{\alpha}=\text{arg max}_{\alpha} \sum\limits_{i=1}^{n} \int p(x_i|\beta_i) p(\beta_i|\alpha) d\beta_i $$</li>
-<li class="fragment appear">aka <b>evidence approximation</b> $$ \text{evidence} = p(x_i|\alpha) = \int p(x_i|\beta_i) p(\beta_i|\alpha) d\beta_i $$</li>
-<li class="fragment appear"><b>Here we use the data to determine the prior, is that legit?</b></li>
+<li data-fragment-index="1" class="fragment appear">Estimate hyperparameters via maximum likelihood $$ \hat{\alpha}=\text{arg max}_{\alpha} \sum\limits_{i=1}^{n} \int p(x_i|\beta_i) p(\beta_i|\alpha) d\beta_i $$</li>
+<li data-fragment-index="2" class="fragment appear">aka <b>evidence approximation</b> $$ \text{evidence} = p(x_i|\alpha) = \int p(x_i|\beta_i) p(\beta_i|\alpha) d\beta_i $$</li>
+<li data-fragment-index="3" class="fragment appear"><b>Here we use the data to determine the prior, is that legit?</b></li>
 
 </ul>
 
+<aside class="notes">
+<ul class="org-ul">
+<li>full bayesian inference: "bayes empirical bayes"
+</li>
+<li>needs a hyperprior
+</li>
+<li>evidence is the prob of the data, after integrating out the parameters. aka marginal likelihood.
+</li>
+</ul>
+
+</aside>
 </section>
 </section>
 <section>
