@@ -7,7 +7,7 @@
 <meta name="author" content="(Yau Group meeting)"/>
 
 <link rel="stylesheet" href="./css/reveal.css"/>
-<link rel="stylesheet" href="./css/theme/sky.css" id="theme"/>
+<link rel="stylesheet" href="./css/theme/solarized.css" id="theme"/>
 
 <!-- If the query includes 'print-pdf', include the PDF print sheet -->
 <script>
@@ -62,8 +62,8 @@
 <ul>
 <li data-fragment-index="5" class="fragment appear">Generalise this to accomodate most common models
 <ul>
-<li data-fragment-index="6" class="fragment appear">conditional models: \(p(x_i|\beta) \rightarrow p(x_i|\mathbf{y}_i,\beta) \stackrel{\text{e.g.}}{=}\mathcal{N}(x_i|\mathbf{w}^T \mathbf{y}_i,\sigma)\)</li>
-<li data-fragment-index="7" class="fragment appear">or latent variable models: \(p(x_i|\beta) = \sum_z p(x_i,z_i|\beta) \stackrel{\text{e.g.}}{=} \sum_k \pi_k \mathcal{N}(x_i|\mu_k,\sigma_k)\)</li>
+<li data-fragment-index="6" class="fragment appear">conditional models: $$p(x_i|\beta) \rightarrow p(x_i|\mathbf{y}_i,\beta) \stackrel{\text{e.g.}}{=}\mathcal{N}(x_i|\mathbf{w}^T \mathbf{y}_i,\sigma)$$</li>
+<li data-fragment-index="7" class="fragment appear">or latent variable models: $$p(x_i|\beta) = \sum_z p(x_i,z_i|\beta) \stackrel{\text{e.g.}}{=} \sum_k \pi_k \mathcal{N}(x_i|\mu_k,\sigma_k)$$</li>
 
 </ul></li>
 
@@ -298,17 +298,17 @@ $$ y_i | x_i \sim \text{Bernoulli}(\sigma(\omega^T x_i)) $$
 <section id="slide-sec-4">
 <h2 id="sec-4">The posterior predictive</h2>
 <ul>
-<li data-fragment-index="1" class="fragment appear">Classical Bayesian model: $$p(x_i|\mathbf{x},\alpha) = \int p(x_i|\beta)\,p(\beta|\mathbf{x},\alpha)d\beta$$</li>
-
-</ul>
+<li data-fragment-index="1" class="fragment appear">Classical Bayesian model: $$p(x_i|\mathbf{x},\alpha) = \int p(x_i|\beta)\,p(\beta|\mathbf{x},\alpha)d\beta$$
 <ul>
-<li data-fragment-index="4" class="fragment highlight-red">Gives correct predictive distr. only if the data comes from the model.</li>
-<li>Robust Bayesian model $$p(x_i|\hat{\alpha}) = \int p(x_i|\beta_i)\,p(\beta_i|\hat{\alpha}) d\beta_i$$
+<li data-fragment-index="4" class="fragment appear">Gives correct predictive distr. only if the data comes from the model.</li>
+
+</ul></li>
+<li data-fragment-index="2" class="fragment appear">Robust Bayesian model $$p(x_i|\hat{\alpha}) = \int p(x_i|\beta_i)\,p(\beta_i|\hat{\alpha}) d\beta_i$$
 <ul>
 <li data-fragment-index="5" class="fragment appear">Gives correct predictive distr. independent of model mismatch.</li>
 
 </ul></li>
-<li>If we want to make predictions under the model, which one should we choose?</li>
+<li data-fragment-index="3" class="fragment appear">If we want to make predictions under the model, which one should we choose?</li>
 
 </ul>
 
@@ -345,8 +345,9 @@ slideNumber: true,
 rollingLinks: true,
 keyboard: true,
 overview: true,
-width: 1400,
-height: 1000,
+width: 1920,
+height: 1080,
+margin: 0.03,
 minScale: 0.50,
 maxScale: 2.50,
 
